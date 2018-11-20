@@ -110,5 +110,6 @@ scripts/
 # editor, os cache directory
 *.code-workspace
 .vscode/
+*.py.*.py
 .idea/
 __MACOSX/
