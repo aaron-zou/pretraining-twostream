@@ -4,10 +4,12 @@ cycler==0.10.0
 decorator==4.3.0
 enum34==1.1.6
 flake8==3.5.0
+grpcio==1.16.1
 ipython==7.0.1
 ipython-genutils==0.2.0
 jedi==0.13.1
 kiwisolver==1.0.1
+Markdown==3.0.1
 matplotlib==3.0.0
 mccabe==0.6.1
 numpy==1.15.2
@@ -34,3 +36,4 @@ torchvision==0.2.1
 tqdm==4.26.0
 traitlets==4.3.2
 wcwidth==0.1.7
+Werkzeug==0.14.1
