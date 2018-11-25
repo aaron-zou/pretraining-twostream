@@ -23,7 +23,8 @@ class spatial_dataset(Dataset):
         if video_name.split('_')[0] == 'HandstandPushups':
             n, g = video_name.split('_', 1)
             name = 'HandStandPushups_' + g
-            path = self.root_dir + 'HandstandPushups' + '/separated_images/v_' + name + '/v_' + name + '_'
+            path = self.root_dir + 'HandstandPushups' + \
+                '/separated_images/v_' + name + '/v_' + name + '_'
         else:
             path = self.root_dir + video_name.split(
                 '_'

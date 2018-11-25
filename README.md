@@ -2,6 +2,10 @@
 
 Cleaner Git repository to hold research work.
 
+## Notes
+
+HMDB51 has a minimum frame count of 17 vs. 28 for UCF-101
+
 ## Acknowledgements
 
 Note: all below repositories either have no license or use the MIT License, which I am also using, thereby complying with the provisions of the MIT license.

@@ -106,6 +106,8 @@ input/
 saved/
 datasets/
 scripts/
+*.pickle
+*.pth
 
 # editor, os cache directory
 *.code-workspace
