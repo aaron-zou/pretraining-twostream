@@ -1,6 +1,8 @@
 from __future__ import print_function
 import numpy as np
 import pickle
+import cv2
+import os
 from PIL import Image
 from enum import Enum
 import time
@@ -17,7 +19,7 @@ import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-from .split_train_test_video import *
+from dataloader.split_train_test_video import UCF101_splitter, HmdbSplitter
 
 FILE = os.path.dirname(os.path.realpath(__file__))
 
@@ -71,8 +73,8 @@ class MotionDataset(Dataset):
             # TODO: hardcoding compensation for PIL/OpenCV format
             # imgH = (Image.open(h_image))
             # imgV = (Image.open(v_image))
-            imgH = Image.fromarray(cv2.imread(h_image))
-            imgV = Image.fromarray(cv2.imread(v_image))
+            imgH = Image.fromarray(cv2.imread(h_image, 0))
+            imgV = Image.fromarray(cv2.imread(v_image, 0))
 
             H = self.transform(imgH)
             V = self.transform(imgV)
@@ -143,7 +145,7 @@ class Motion_DataLoader():
 
     def load_frame_count(self):
         if self.dataset_type == DataSetType.UCF101:
-            with open(os.path.join(FILE, 'dic/frame_count.pickle'),
+            with open(os.path.join(FILE, 'frame_counter/ucf_frame_count.pickle'),
                       'rb') as file:
                 dic_frame = pickle.load(file)
 
@@ -155,7 +157,7 @@ class Motion_DataLoader():
                 self.frame_count[videoname] = dic_frame[line]
         elif self.dataset_type == DataSetType.HMDB51:
             # Don't need to remove any v_ or .avi
-            with open(os.path.join(FILE, 'dic/hmdb_frame_count.pickle'),
+            with open(os.path.join(FILE, 'frame_counter/hmdb_frame_count.pickle'),
                       'rb') as file:
                 dic_frame = pickle.load(file)
             for line in dic_frame:

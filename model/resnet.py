@@ -4,7 +4,7 @@ segmentation networks (following DeepLab v2).
 """
 import torch
 import torch.nn as nn
-from deeplab_resnet import Classifier_Module, Res_Deeplab
+from model.deeplab_resnet import Classifier_Module, Res_Deeplab
 from torchvision import models
 
 PRETRAINED_DEEPLAB_PATH = ('/vision/vision_users/azou/motion_features'

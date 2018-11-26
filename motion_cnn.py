@@ -9,7 +9,7 @@ import tqdm
 import shutil
 from random import randint
 import argparse
-import resnet
+from model import resnet
 
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
@@ -21,8 +21,8 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 import utils
-import model.network
-import dataloader
+from model.network import resnet101
+import dataloader.motion_dataloader as dataloader
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
@@ -38,7 +38,7 @@ parser.add_argument(
     help='number of total epochs')
 parser.add_argument(
     '--batch-size',
-    default=16,
+    default=8,
     type=int,
     metavar='N',
     help='mini-batch size (default: 16)')
@@ -265,7 +265,7 @@ class Motion_CNN():
         self.model.train()
         end = time.time()
         # mini-batch training
-        progress = tqdm(self.train_loader)
+        progress = tqdm.tqdm(self.train_loader)
         for i, (data, label) in enumerate(progress):
 
             # measure data loading time
@@ -320,7 +320,7 @@ class Motion_CNN():
         self.model.eval()
         self.dic_video_level_preds = {}
         end = time.time()
-        progress = tqdm(self.test_loader)
+        progress = tqdm.tqdm(self.test_loader)
         for i, (keys, data, label) in enumerate(progress):
             label = label.cuda(async=True)
             data_var = Variable(data, volatile=True).cuda(async=True)
