@@ -13,20 +13,21 @@ import torchvision.models as models
 import torch.nn as nn
 import torch
 import torch.backends.cudnn as cudnn
+
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 import dataloader
-from utils import *
-from network import *
+import utils
+import model.network
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 parser = argparse.ArgumentParser(
     description='UCF101 spatial stream on resnet101')
-parser.add_argument('--epochs', default=500, type=int,
+parser.add_argument('--epochs', default=20, type=int,
                     metavar='N', help='number of total epochs')
-parser.add_argument('--batch-size', default=25, type=int,
+parser.add_argument('--batch-size', default=16, type=int,
                     metavar='N', help='mini-batch size (default: 25)')
 parser.add_argument('--lr', default=5e-4, type=float,
                     metavar='LR', help='initial learning rate')

@@ -68,11 +68,18 @@ class MotionDataset(Dataset):
             h_image = u + '/' + frame_idx + '.jpg'
             v_image = v + '/' + frame_idx + '.jpg'
 
-            imgH = (Image.open(h_image))
-            imgV = (Image.open(v_image))
+            # TODO: hardcoding compensation for PIL/OpenCV format
+            # imgH = (Image.open(h_image))
+            # imgV = (Image.open(v_image))
+            imgH = Image.fromarray(cv2.imread(h_image))
+            imgV = Image.fromarray(cv2.imread(v_image))
 
             H = self.transform(imgH)
             V = self.transform(imgV)
+
+            # TODO: hardcoding compensation for PIL/OpenCV frmat
+            H *= 255
+            V *= 255
 
             flow[2 * (j - 1), :, :] = H
             flow[2 * (j - 1) + 1, :, :] = V

@@ -272,5 +272,5 @@ def weight_transform(model_dict, pretrain_dict, channel):
 
 # Test network
 if __name__ == '__main__':
-    model = resnet34(pretrained=True, channel=10)
+    model = resnet101(pretrained=True, channel=10)
     print(model)

@@ -1,7 +1,10 @@
 import numpy as np
+
 import pickle
 from PIL import Image
+import multiprocessing
 import time
+import os
 import tqdm
 import shutil
 from random import randint
@@ -17,8 +20,8 @@ import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-from utils import *
-from network import *
+import utils
+import model.network
 import dataloader
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
@@ -29,7 +32,7 @@ parser = argparse.ArgumentParser(
     description='UCF101 motion stream on resnet101')
 parser.add_argument(
     '--epochs',
-    default=25,
+    default=20,
     type=int,
     metavar='N',
     help='number of total epochs')
@@ -58,7 +61,7 @@ parser.add_argument(
 parser.add_argument(
     '--transfer-path',
     dest='transfer_path',
-    default='/vision/vision_users/azou/motion_features/jobs/seg_jobs/train_old/data/snapshots/fusionseg_best_20000.pth',
+    default='/vision/vision_users/azou/data/models/fusionseg_binary_20000_1e-5.pth',
     help='path to transfer model (only used if --model=Transfer)')
 parser.add_argument(
     '--resume',
@@ -102,7 +105,7 @@ def main():
     # Prepare DataLoader
     data_loader = dataloader.Motion_DataLoader(
         BATCH_SIZE=arg.batch_size,
-        num_workers=8,
+        num_workers=multiprocessing.cpu_count(),
         path=arg.flow_dir,
         list_path=arg.split_dir,
         split='01',
@@ -241,7 +244,7 @@ class Motion_CNN():
                     pickle.dump(self.dic_video_level_preds, f)
                 f.close()
 
-            save_checkpoint({
+            utils.save_checkpoint({
                 'epoch': self.epoch,
                 'state_dict': self.model.state_dict(),
                 'best_prec1': self.best_prec1,
@@ -253,11 +256,11 @@ class Motion_CNN():
     def train_1epoch(self):
         print('==> Epoch:[{0}/{1}][training stage]'.format(self.epoch,
                                                            self.nb_epochs))
-        batch_time = AverageMeter()
-        data_time = AverageMeter()
-        losses = AverageMeter()
-        top1 = AverageMeter()
-        top5 = AverageMeter()
+        batch_time = utils.AverageMeter()
+        data_time = utils.AverageMeter()
+        losses = utils.AverageMeter()
+        top1 = utils.AverageMeter()
+        top5 = utils.AverageMeter()
         # switch to train mode
         self.model.train()
         end = time.time()
@@ -277,7 +280,7 @@ class Motion_CNN():
             loss = self.criterion(output, target_var)
 
             # measure accuracy and record loss
-            prec1, prec5 = accuracy(output.data, label, topk=(1, 5))
+            prec1, prec5 = utils.accuracy(output.data, label, topk=(1, 5))
             losses.update(loss.data[0], data.size(0))
             top1.update(prec1[0], data.size(0))
             top5.update(prec5[0], data.size(0))
@@ -300,19 +303,19 @@ class Motion_CNN():
             'Prec@5': [round(top5.avg, 4)],
             'lr': self.optimizer.param_groups[0]['lr']
         }
-        record_info(info,
-                    os.path.join(self.output_dir,
-                                 'opf_train_{}.csv'.format(self.model_type)),
-                    'train')
+        utils.record_info(info,
+                          os.path.join(self.output_dir,
+                                       'opf_train_{}.csv'.format(self.model_type)),
+                          'train')
 
     def validate_1epoch(self):
         print('==> Epoch:[{0}/{1}][validation stage]'.format(self.epoch,
                                                              self.nb_epochs))
 
-        batch_time = AverageMeter()
-        losses = AverageMeter()
-        top1 = AverageMeter()
-        top5 = AverageMeter()
+        batch_time = utils.AverageMeter()
+        losses = utils.AverageMeter()
+        top1 = utils.AverageMeter()
+        top5 = utils.AverageMeter()
         # switch to evaluate mode
         self.model.eval()
         self.dic_video_level_preds = {}
@@ -382,7 +385,7 @@ class Motion_CNN():
         loss = self.criterion(
             Variable(video_level_preds).cuda(),
             Variable(video_level_labels).cuda())
-        top1, top5 = accuracy(
+        top1, top5 = utils.accuracy(
             video_level_preds, video_level_labels, topk=(1, 5))
 
         top1 = float(top1.numpy())
