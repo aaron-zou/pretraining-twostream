@@ -93,7 +93,7 @@ parser.add_argument(
 parser.add_argument(
     '--split-dir',
     dest='split_dir',
-    default='/vision/vision_users/azou/data/ecf101_splits/',
+    default='/vision/vision_users/azou/data/ucf101_splits/',
     help="directory containing train/test split files")
 parser.add_argument(
     '--percent',
