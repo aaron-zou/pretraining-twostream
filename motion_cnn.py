@@ -1,28 +1,27 @@
-import numpy as np
-
-import pickle
-from PIL import Image
-import multiprocessing
-import time
-import os
-import tqdm
-import shutil
-from random import randint
 import argparse
-import resnet
+import multiprocessing
+import os
+import pickle
+import shutil
+import time
+from random import randint
 
-from torch.utils.data import Dataset, DataLoader
-import torchvision.transforms as transforms
-import torchvision.models as models
-import torch.nn as nn
+import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
+import torch.nn as nn
+import torchvision.models as models
+import torchvision.transforms as transforms
+import tqdm
+from PIL import Image
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import DataLoader, Dataset
 
-import utils
-from model.network import resnet101
 import dataloader.motion_dataloader as motion_dataloader
+import utils
+from model import resnet
+from model.network import resnet101
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
@@ -265,7 +264,7 @@ class Motion_CNN():
         self.model.train()
         end = time.time()
         # mini-batch training
-        progress = tqdm(self.train_loader)
+        progress = tqdm.tqdm(self.train_loader)
         for i, (data, label) in enumerate(progress):
 
             # measure data loading time
@@ -320,7 +319,7 @@ class Motion_CNN():
         self.model.eval()
         self.dic_video_level_preds = {}
         end = time.time()
-        progress = tqdm(self.test_loader)
+        progress = tqdm.tqdm(self.test_loader)
         for i, (keys, data, label) in enumerate(progress):
             label = label.cuda(async=True)
             data_var = Variable(data, volatile=True).cuda(async=True)

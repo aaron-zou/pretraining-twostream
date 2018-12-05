@@ -1,6 +1,8 @@
 from __future__ import print_function
 import numpy as np
 import pickle
+import cv2
+import os
 from PIL import Image
 from enum import Enum
 import time
@@ -144,7 +146,7 @@ class Motion_DataLoader():
 
     def load_frame_count(self):
         if self.dataset_type == DataSetType.UCF101:
-            with open(os.path.join(FILE, 'dic/frame_count.pickle'),
+            with open(os.path.join(FILE, 'frame_counter/ucf_frame_count.pickle'),
                       'rb') as file:
                 dic_frame = pickle.load(file)
 
@@ -156,7 +158,7 @@ class Motion_DataLoader():
                 self.frame_count[videoname] = dic_frame[line]
         elif self.dataset_type == DataSetType.HMDB51:
             # Don't need to remove any v_ or .avi
-            with open(os.path.join(FILE, 'dic/hmdb_frame_count.pickle'),
+            with open(os.path.join(FILE, 'frame_counter/hmdb_frame_count.pickle'),
                       'rb') as file:
                 dic_frame = pickle.load(file)
             for line in dic_frame:
