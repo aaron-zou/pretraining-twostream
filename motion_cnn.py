@@ -280,9 +280,9 @@ class Motion_CNN():
 
             # measure accuracy and record loss
             prec1, prec5 = utils.accuracy(output.data, label, topk=(1, 5))
-            losses.update(loss.data[0], data.size(0))
-            top1.update(prec1[0], data.size(0))
-            top5.update(prec5[0], data.size(0))
+            losses.update(loss.item(), data.size(0))
+            top1.update(prec1.item(), data.size(0))
+            top5.update(prec5.item(), data.size(0))
 
             # compute gradient and do SGD step
             self.optimizer.zero_grad()
@@ -295,11 +295,11 @@ class Motion_CNN():
 
         info = {
             'Epoch': [self.epoch],
-            'Batch Time': [round(batch_time.avg, 3)],
-            'Data Time': [round(data_time.avg, 3)],
-            'Loss': [round(losses.avg, 5)],
-            'Prec@1': [round(top1.avg, 4)],
-            'Prec@5': [round(top5.avg, 4)],
+            'Batch Time': [round(float(batch_time.avg), 3)],
+            'Data Time': [round(float(data_time.avg), 3)],
+            'Loss': [round(float(losses.avg), 5)],
+            'Prec@1': [round(float(top1.avg), 4)],
+            'Prec@5': [round(float(top5.avg), 4)],
             'lr': self.optimizer.param_groups[0]['lr']
         }
         utils.record_info(info,
