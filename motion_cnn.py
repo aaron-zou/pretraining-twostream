@@ -21,8 +21,8 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 import utils
-import model.network
-import dataloader
+from model.network import resnet101
+import dataloader.motion_dataloader as motion_dataloader
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
@@ -38,7 +38,7 @@ parser.add_argument(
     help='number of total epochs')
 parser.add_argument(
     '--batch-size',
-    default=16,
+    default=8,
     type=int,
     metavar='N',
     help='mini-batch size (default: 16)')
@@ -93,7 +93,7 @@ parser.add_argument(
 parser.add_argument(
     '--split-dir',
     dest='split_dir',
-    default='/vision/vision_users/azou/data/ucfTrainTestlist/',
+    default='/vision/vision_users/azou/data/ecf101_splits/',
     help="directory containing train/test split files")
 
 
@@ -103,14 +103,14 @@ def main():
     print(arg)
 
     # Prepare DataLoader
-    data_loader = dataloader.Motion_DataLoader(
+    data_loader = motion_dataloader.Motion_DataLoader(
         BATCH_SIZE=arg.batch_size,
         num_workers=multiprocessing.cpu_count(),
         path=arg.flow_dir,
         list_path=arg.split_dir,
         split='01',
         in_channel=10,
-        dataset_type=dataloader.DataSetType[arg.dataset])
+        dataset_type=motion_dataloader.DataSetType[arg.dataset])
 
     train_loader, test_loader, test_video = data_loader.run()
 

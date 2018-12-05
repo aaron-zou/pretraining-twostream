@@ -5,6 +5,7 @@ from PIL import Image
 from enum import Enum
 import time
 import shutil
+import os
 import random
 import argparse
 
@@ -17,7 +18,7 @@ import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-from .split_train_test_video import *
+from dataloader.split_train_test_video import UCF101_splitter, HmdbSplitter
 
 FILE = os.path.dirname(os.path.realpath(__file__))
 
@@ -71,8 +72,8 @@ class MotionDataset(Dataset):
             # TODO: hardcoding compensation for PIL/OpenCV format
             # imgH = (Image.open(h_image))
             # imgV = (Image.open(v_image))
-            imgH = Image.fromarray(cv2.imread(h_image))
-            imgV = Image.fromarray(cv2.imread(v_image))
+            imgH = Image.fromarray(cv2.imread(h_image, 0))
+            imgV = Image.fromarray(cv2.imread(v_image, 0))
 
             H = self.transform(imgH)
             V = self.transform(imgV)
