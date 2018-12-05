@@ -140,7 +140,7 @@ def main():
         # Data Loader
         train_loader=train_loader,
         test_loader=test_loader,
-        percent=arg.percent,
+        percent=float(arg.percent),
         # Utility
         start_epoch=arg.start_epoch,
         resume=arg.resume,
