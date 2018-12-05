@@ -2,6 +2,7 @@ import argparse
 import multiprocessing
 import os
 import pickle
+import random
 import shutil
 import time
 from random import randint
@@ -94,6 +95,11 @@ parser.add_argument(
     dest='split_dir',
     default='/vision/vision_users/azou/data/ecf101_splits/',
     help="directory containing train/test split files")
+parser.add_argument(
+    '--percent',
+    dest='percent',
+    default=100.0,
+    help="Use this percentage of the training data")
 
 
 def main():
@@ -134,6 +140,7 @@ def main():
         # Data Loader
         train_loader=train_loader,
         test_loader=test_loader,
+        percent=arg.percent,
         # Utility
         start_epoch=arg.start_epoch,
         resume=arg.resume,
@@ -153,7 +160,7 @@ def main():
 
 class Motion_CNN():
     def __init__(self, model_type, transfer_path, nb_epochs, lr, batch_size,
-                 resume, start_epoch, evaluate, output_dir, num_classes,
+                 resume, start_epoch, percent, evaluate, output_dir, num_classes,
                  zero_indexed, train_loader, test_loader, channel, test_video):
         self.model_type = model_type
         self.transfer_path = transfer_path
@@ -169,6 +176,7 @@ class Motion_CNN():
         self.train_loader = train_loader
         self.test_loader = test_loader
         self.best_prec1 = 0
+        self.percent = percent
         self.channel = channel
         self.test_video = test_video
 
@@ -266,6 +274,9 @@ class Motion_CNN():
         # mini-batch training
         progress = tqdm.tqdm(self.train_loader)
         for i, (data, label) in enumerate(progress):
+            # Probabilistically withhold a data batch
+            if 100 * random.random() > self.percent:
+                continue
 
             # measure data loading time
             data_time.update(time.time() - end)
@@ -322,8 +333,9 @@ class Motion_CNN():
         progress = tqdm.tqdm(self.test_loader)
         for i, (keys, data, label) in enumerate(progress):
             label = label.cuda(async=True)
-            data_var = Variable(data, volatile=True).cuda(async=True)
-            label_var = Variable(label, volatile=True).cuda(async=True)
+            with torch.no_grad():
+                data_var = Variable(data).cuda(async=True)
+                label_var = Variable(label).cuda(async=True)
 
             # compute output
             output = self.model(data_var)
@@ -350,10 +362,10 @@ class Motion_CNN():
             'Prec@1': [np.round(video_top1, 3)],
             'Prec@5': [np.round(video_top5, 3)]
         }
-        record_info(info,
-                    os.path.join(self.output_dir,
-                                 'opf_test_{}.csv'.format(self.model_type)),
-                    'test')
+        utils.record_info(info,
+                          os.path.join(self.output_dir,
+                                       'opf_test_{}.csv'.format(self.model_type)),
+                          'test')
         return video_top1, video_loss
 
     def frame2_video_level_accuracy(self):
